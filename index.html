@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arrays & Searching — ScholarNest</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --blue-50: #E6F1FB; --blue-100: #B5D4F4; --blue-400: #378ADD; --blue-600: #185FA5; --blue-800: #0C447C; --blue-900: #042C53;
+    --purple-50: #EEEDFE; --purple-100: #CECBF6; --purple-400: #7F77DD; --purple-600: #534AB7; --purple-800: #3C3489; --purple-900: #26215C;
+    --teal-50: #E1F5EE; --teal-400: #1D9E75; --teal-600: #0F6E56; --teal-800: #085041;
+    --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-400: #BA7517; --amber-600: #854F0B;
+    --coral-50: #FAECE7; --coral-400: #D85A30; --coral-600: #993C1D; --coral-800: #712B13;
+    --green-50: #EAF3DE; --green-400: #639922; --green-600: #3B6D11;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-400: #888780; --gray-600: #5F5E5A;
+    --red-50: #FCEBEB; --red-400: #E24B4A; --red-600: #A32D2D;
+
+    --bg: #FAFAF8;
+    --bg2: #F1EFE8;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.18);
+    --text: #1A1A18;
+    --text2: #5F5E5A;
+    --text3: #888780;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --r: 10px;
+    --r2: 16px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border2);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 18px; color: var(--blue-800);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--blue-600), var(--purple-600));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 14px;
+    letter-spacing: -0.03em;
+  }
+  .nav-links { display: flex; gap: 0; }
+  .nav-links a {
+    color: var(--text2); text-decoration: none; font-size: 13px; font-weight: 500;
+    padding: 6px 12px; border-radius: 6px; transition: all 0.15s;
+  }
+  .nav-links a:hover { color: var(--text); background: var(--bg2); }
+  .nav-badge {
+    background: var(--blue-50); color: var(--blue-800);
+    font-size: 11px; font-weight: 600; padding: 3px 8px;
+    border-radius: 20px; border: 0.5px solid var(--blue-100);
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(160deg, var(--blue-900) 0%, var(--purple-900) 100%);
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(55,138,221,0.2) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(127,119,221,0.2) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.1); border: 0.5px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 500;
+    padding: 5px 12px; border-radius: 20px; margin-bottom: 1.5rem;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700;
+    color: #fff; line-height: 1.18; margin-bottom: 1rem;
+    letter-spacing: -0.03em;
+  }
+  .hero h1 span { color: var(--amber-100); }
+  .hero p {
+    color: rgba(255,255,255,0.7); font-size: 1.05rem;
+    max-width: 520px; margin: 0 auto 2rem;
+  }
+  .hero-pills {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  }
+  .hero-pill {
+    background: rgba(255,255,255,0.1); border: 0.5px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.8); padding: 5px 14px; border-radius: 20px;
+    font-size: 12.5px; font-weight: 500;
+  }
+
+  /* CONTENT */
+  .content { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+  /* SECTION */
+  .section { margin-bottom: 4rem; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+  .section-icon {
+    width: 38px; height: 38px; border-radius: var(--r);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .section h2 {
+    font-size: 1.5rem; font-weight: 700; color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .section-divider {
+    height: 0.5px; background: var(--border); margin-bottom: 1.5rem;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--r2);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .card h3 {
+    font-size: 1rem; font-weight: 600; color: var(--text);
+    margin-bottom: 0.6rem;
+  }
+  .card p { color: var(--text2); font-size: 14.5px; line-height: 1.7; }
+
+  /* DEFINITION BOX */
+  .def-box {
+    background: var(--blue-50);
+    border-left: 3px solid var(--blue-600);
+    border-radius: 0 var(--r) var(--r) 0;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .def-box p { color: var(--blue-800); font-size: 14.5px; line-height: 1.7; }
+  .def-box strong { font-weight: 600; }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: #1E1E2E;
+    border-radius: var(--r);
+    overflow: hidden;
+    margin: 1rem 0;
+    font-family: var(--mono);
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.05);
+    border-bottom: 0.5px solid rgba(255,255,255,0.08);
+  }
+  .code-lang {
+    color: #94A3B8; font-size: 11px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .code-dots { display: flex; gap: 5px; }
+  .code-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .code-dots span:nth-child(1) { background: #FF5F57; }
+  .code-dots span:nth-child(2) { background: #FFBD2E; }
+  .code-dots span:nth-child(3) { background: #28CA42; }
+  .code-body {
+    padding: 1.1rem 1.25rem;
+    overflow-x: auto;
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: #CDD6F4;
+  }
+  .kw { color: #CBA6F7; } /* keyword */
+  .ty { color: #89DCEB; } /* type */
+  .fn { color: #89B4FA; } /* function */
+  .st { color: #A6E3A1; } /* string */
+  .cm { color: #6C7086; font-style: italic; } /* comment */
+  .nm { color: #FAB387; } /* number */
+  .op { color: #89DCEB; } /* operator */
+
+  /* ARRAY VISUALIZER */
+  .array-visual {
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--r2);
+    padding: 1.75rem;
+    margin: 1.25rem 0;
+    overflow-x: auto;
+  }
+  .array-visual .label {
+    font-size: 12px; font-weight: 600; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .array-row {
+    display: flex; gap: 0;
+    border: 1.5px solid var(--border2);
+    border-radius: var(--r);
+    overflow: hidden;
+    width: fit-content;
+  }
+  .array-cell {
+    width: 60px; height: 52px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600; font-family: var(--mono);
+    border-right: 0.5px solid var(--border);
+    color: var(--text);
+    transition: background 0.2s;
+  }
+  .array-cell:last-child { border-right: none; }
+  .array-cell.highlight { background: var(--blue-50); color: var(--blue-800); }
+  .array-cell.active { background: var(--amber-50); color: var(--amber-400); }
+  .array-cell.found { background: var(--teal-50); color: var(--teal-600); }
+  .array-indices {
+    display: flex; gap: 0; width: fit-content; margin-top: 4px;
+  }
+  .array-index {
+    width: 60px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-family: var(--mono);
+    color: var(--text3); font-weight: 500;
+  }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* KEY POINTS */
+  .key-points { display: flex; flex-direction: column; gap: 8px; margin: 1rem 0; }
+  .key-point {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: var(--gray-50); border-radius: var(--r);
+    padding: 10px 14px;
+    font-size: 14px; color: var(--text2);
+  }
+  .key-point .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--blue-400); flex-shrink: 0; margin-top: 5px;
+  }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 20px;
+    font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .badge-blue { background: var(--blue-50); color: var(--blue-800); border: 0.5px solid var(--blue-100); }
+  .badge-purple { background: var(--purple-50); color: var(--purple-800); border: 0.5px solid var(--purple-100); }
+  .badge-teal { background: var(--teal-50); color: var(--teal-800); border: 0.5px solid #9FE1CB; }
+  .badge-amber { background: var(--amber-50); color: var(--amber-600); border: 0.5px solid var(--amber-100); }
+
+  /* COMPARISON TABLE */
+  .compare-table {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    border: 0.5px solid var(--border2); border-radius: var(--r2);
+    overflow: hidden; margin: 1.25rem 0;
+    font-size: 14px;
+  }
+  .compare-table th {
+    background: var(--bg2); padding: 10px 16px;
+    font-size: 12.5px; font-weight: 600; color: var(--text2);
+    text-align: left; border-bottom: 0.5px solid var(--border2);
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .compare-table td {
+    padding: 11px 16px; border-bottom: 0.5px solid var(--border);
+    color: var(--text2);
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: var(--gray-50); }
+  .compare-table td:first-child { font-weight: 500; color: var(--text); }
+
+  /* INTERACTIVE SEARCH */
+  .search-demo {
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--r2);
+    padding: 1.5rem;
+    margin: 1.25rem 0;
+  }
+  .search-demo h4 {
+    font-size: 14px; font-weight: 600; color: var(--text);
+    margin-bottom: 1rem;
+  }
+  .demo-controls {
+    display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;
+  }
+  .demo-controls input[type="number"] {
+    width: 80px; padding: 7px 10px;
+    border: 0.5px solid var(--border2); border-radius: 8px;
+    font-family: var(--mono); font-size: 13px;
+    background: var(--bg); color: var(--text);
+    outline: none;
+  }
+  .demo-controls input[type="number"]:focus { border-color: var(--blue-400); }
+  .demo-btn {
+    padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 0.5px solid var(--border2);
+    background: var(--bg); color: var(--text);
+    transition: all 0.15s;
+  }
+  .demo-btn:hover { background: var(--bg2); }
+  .demo-btn.primary { background: var(--blue-600); color: white; border-color: var(--blue-600); }
+  .demo-btn.primary:hover { background: var(--blue-800); }
+  .demo-array-container { overflow-x: auto; padding-bottom: 4px; }
+  .demo-status {
+    margin-top: 10px; padding: 8px 12px; border-radius: 8px;
+    font-size: 13px; font-weight: 500;
+    min-height: 36px; display: flex; align-items: center;
+  }
+  .demo-status.info { background: var(--blue-50); color: var(--blue-800); }
+  .demo-status.success { background: var(--teal-50); color: var(--teal-600); }
+  .demo-status.error { background: var(--red-50); color: var(--red-600); }
+  .demo-steps { margin-top: 8px; font-size: 12.5px; color: var(--text3); }
+
+  /* DIAGRAM CONTAINER */
+  .diagram-wrap {
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--r2);
+    overflow: hidden;
+    margin: 1.25rem 0;
+  }
+  .diagram-title {
+    padding: 10px 16px;
+    background: var(--bg2);
+    border-bottom: 0.5px solid var(--border);
+    font-size: 12.5px; font-weight: 600;
+    color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .diagram-wrap svg { display: block; }
+
+  /* FOOTER */
+  footer {
+    text-align: center; padding: 2rem;
+    border-top: 0.5px solid var(--border);
+    color: var(--text3); font-size: 13px;
+  }
+  footer strong { color: var(--blue-800); }
+
+  /* TYPES GRID */
+  .types-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+  @media (max-width: 640px) { .types-grid { grid-template-columns: 1fr; } }
+  .type-card {
+    background: var(--surface); border: 0.5px solid var(--border2);
+    border-radius: var(--r2); padding: 1.25rem;
+    text-align: center;
+  }
+  .type-card .num {
+    font-size: 2rem; font-weight: 700; line-height: 1;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, var(--blue-600), var(--purple-600));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .type-card h4 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .type-card p { font-size: 12.5px; color: var(--text3); }
+
+  /* STEP TRACKER */
+  .steps-visual {
+    display: flex; flex-direction: column; gap: 0;
+    border: 0.5px solid var(--border2); border-radius: var(--r2);
+    overflow: hidden; margin: 1rem 0;
+  }
+  .step-item {
+    display: flex; gap: 1rem; padding: 14px 16px;
+    border-bottom: 0.5px solid var(--border);
+    align-items: flex-start;
+  }
+  .step-item:last-child { border-bottom: none; }
+  .step-num {
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; margin-top: 1px;
+  }
+  .step-item .step-text { font-size: 14px; color: var(--text2); }
+  .step-item .step-text strong { color: var(--text); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-icon">SN</div>
+    ScholarNest
+  </a>
+  <div class="nav-links">
+    <a href="#arrays">Arrays</a>
+    <a href="#1d">1-D Arrays</a>
+    <a href="#linear">Linear Search</a>
+    <a href="#binary">Binary Search</a>
+  </div>
+  <span class="nav-badge">Computer Programming</span>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-eyebrow">📚 Computer Programming Notes</div>
+  <h1>Arrays &amp; <span>Searching Algorithms</span></h1>
+  <p>Master one-dimensional arrays, initialization, input/output, linear search, and binary search — with interactive examples and visual diagrams.</p>
+  <div class="hero-pills">
+    <span class="hero-pill">Arrays</span>
+    <span class="hero-pill">1-D Arrays</span>
+    <span class="hero-pill">Linear Search</span>
+    <span class="hero-pill">Binary Search</span>
+    <span class="hero-pill">C Programming</span>
+  </div>
+</header>
+
+<main class="content">
+
+  <!-- ===== SECTION 1: ARRAYS ===== -->
+  <section class="section" id="arrays">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--blue-50);">🗂️</div>
+      <h2>What is an Array?</h2>
+    </div>
+    <div class="section-divider"></div>
+
+    <div class="def-box">
+      <p><strong>An array</strong> is a collection of variables of the <strong>same data type</strong> referred to by a common name. Elements are stored in <strong>contiguous memory locations</strong>, where the lowest address corresponds to the first element and the highest to the last.</p>
+    </div>
+
+    <div class="key-points">
+      <div class="key-point"><div class="dot"></div><span>Index always starts from <strong>0</strong> in an array. The last element is at index <strong>size − 1</strong>.</span></div>
+      <div class="key-point"><div class="dot"></div><span>An array is also known as a <strong>subscripted variable</strong>.</span></div>
+      <div class="key-point"><div class="dot"></div><span>Before using an array, its <strong>type and dimension must be declared</strong>.</span></div>
+      <div class="key-point"><div class="dot"></div><span>A specific element is accessed by its <strong>index (subscript)</strong>.</span></div>
+    </div>
+
+    <!-- Memory visual -->
+    <div class="array-visual">
+      <div class="label">Memory layout — array of 9 integers</div>
+      <div class="array-row">
+        <div class="array-cell">7</div>
+        <div class="array-cell">11</div>
+        <div class="array-cell">6</div>
+        <div class="array-cell">55</div>
+        <div class="array-cell highlight">98</div>
+        <div class="array-cell">45</div>
+        <div class="array-cell">16</div>
+        <div class="array-cell">96</div>
+        <div class="array-cell">46</div>
+      </div>
+      <div class="array-indices">
+        <div class="array-index" style="color:var(--blue-400);font-weight:700;">0</div>
+        <div class="array-index">1</div>
+        <div class="array-index">2</div>
+        <div class="array-index">3</div>
+        <div class="array-index highlight" style="color:var(--blue-400);font-weight:700;">4</div>
+        <div class="array-index">5</div>
+        <div class="array-index">6</div>
+        <div class="array-index">7</div>
+        <div class="array-index" style="color:var(--coral-400);font-weight:700;">8</div>
+      </div>
+      <div style="display:flex;gap:2rem;margin-top:12px;font-size:12.5px;color:var(--text3);">
+        <span>↑ <strong style="color:var(--blue-600);">Lower Bound</strong> (index 0)</span>
+        <span>↑ <strong style="color:var(--coral-600);">Upper Bound</strong> (index 8)</span>
+        <span><strong>Array Length = 9</strong></span>
+      </div>
+    </div>
+
+    <!-- Types of arrays -->
+    <h3 style="font-size:1.05rem;font-weight:600;margin:1.5rem 0 0.75rem;">Types of Arrays</h3>
+    <div class="types-grid">
+      <div class="type-card">
+        <div class="num">1D</div>
+        <h4>One-Dimensional</h4>
+        <p>Single row of elements accessed by one index</p>
+      </div>
+      <div class="type-card">
+        <div class="num">2D</div>
+        <h4>Two-Dimensional</h4>
+        <p>Matrix of rows &amp; columns, two indices needed</p>
+      </div>
+      <div class="type-card">
+        <div class="num">nD</div>
+        <h4>Multidimensional</h4>
+        <p>Arrays with three or more dimensions</p>
+      </div>
+    </div>
+
+    <!-- 1D vs 2D diagram -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">📊 1D vs 2D Array Structure</div>
+      <svg width="100%" viewBox="0 0 860 320" role="img">
+        <title>1D vs 2D Array Diagram</title>
+        <desc>Comparison of a one-dimensional array (single row) and a two-dimensional array (grid of rows and columns)</desc>
+        <!-- 1D array label -->
+        <text x="40" y="55" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#5F5E5A">1D ARRAY — single row of elements</text>
+        <!-- 1D cells -->
+        <g>
+          <rect x="40" y="68" width="55" height="40" rx="6" fill="#EAF3DE" stroke="#639922" stroke-width="0.8"/>
+          <rect x="97" y="68" width="55" height="40" rx="6" fill="#EAF3DE" stroke="#639922" stroke-width="0.8"/>
+          <rect x="154" y="68" width="55" height="40" rx="6" fill="#EAF3DE" stroke="#639922" stroke-width="0.8"/>
+          <rect x="211" y="68" width="55" height="40" rx="6" fill="#EAF3DE" stroke="#639922" stroke-width="0.8"/>
+          <rect x="268" y="68" width="55" height="40" rx="6" fill="#EAF3DE" stroke="#639922" stroke-width="0.8"/>
+          <rect x="325" y="68" width="55" height="40" rx="6" fill="#EAF3DE" stroke="#639922" stroke-width="0.8"/>
+          <rect x="382" y="68" width="55" height="40" rx="6" fill="#EAF3DE" stroke="#639922" stroke-width="0.8"/>
+          <rect x="439" y="68" width="55" height="40" rx="6" fill="#EAF3DE" stroke="#639922" stroke-width="0.8"/>
+          <rect x="496" y="68" width="55" height="40" rx="6" fill="#EAF3DE" stroke="#639922" stroke-width="0.8"/>
+          <!-- letters -->
+          <text x="67" y="93" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="500" fill="#3B6D11">C</text>
+          <text x="124" y="93" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="500" fill="#3B6D11">O</text>
+          <text x="181" y="93" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="500" fill="#3B6D11">D</text>
+          <text x="238" y="93" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="500" fill="#3B6D11">I</text>
+          <text x="295" y="93" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="500" fill="#3B6D11">N</text>
+          <text x="352" y="93" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="500" fill="#3B6D11">G</text>
+          <text x="409" y="93" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="500" fill="#3B6D11">E</text>
+          <text x="466" y="93" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="500" fill="#3B6D11">E</text>
+          <text x="523" y="93" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="500" fill="#3B6D11">K</text>
+          <!-- indices -->
+          <text x="67" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">0</text>
+          <text x="124" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">1</text>
+          <text x="181" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">2</text>
+          <text x="238" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">3</text>
+          <text x="295" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">4</text>
+          <text x="352" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">5</text>
+          <text x="409" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">6</text>
+          <text x="466" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">7</text>
+          <text x="523" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">8</text>
+        </g>
+
+        <!-- 2D array -->
+        <text x="40" y="168" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#5F5E5A">2D ARRAY — rows &amp; columns</text>
+        <!-- column headers -->
+        <text x="160" y="190" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">col 0</text>
+        <text x="215" y="190" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">col 1</text>
+        <text x="270" y="190" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">col 2</text>
+        <!-- rows -->
+        <g>
+          <!-- row 0 -->
+          <text x="110" y="218" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">row 0</text>
+          <rect x="132" y="200" width="55" height="36" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="189" y="200" width="55" height="36" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="246" y="200" width="55" height="36" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <text x="159" y="223" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="500" fill="#185FA5">A</text>
+          <text x="216" y="223" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="500" fill="#185FA5">A</text>
+          <text x="273" y="223" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="500" fill="#185FA5">A</text>
+          <!-- row 1 -->
+          <text x="110" y="256" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">row 1</text>
+          <rect x="132" y="238" width="55" height="36" rx="5" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
+          <rect x="189" y="238" width="55" height="36" rx="5" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
+          <rect x="246" y="238" width="55" height="36" rx="5" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
+          <text x="159" y="261" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="500" fill="#534AB7">B</text>
+          <text x="216" y="261" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="500" fill="#534AB7">B</text>
+          <text x="273" y="261" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="500" fill="#534AB7">B</text>
+          <!-- row 2 -->
+          <text x="110" y="294" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="11" fill="#888780">row 2</text>
+          <rect x="132" y="276" width="55" height="36" rx="5" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.8"/>
+          <rect x="189" y="276" width="55" height="36" rx="5" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.8"/>
+          <rect x="246" y="276" width="55" height="36" rx="5" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.8"/>
+          <text x="159" y="299" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="500" fill="#0F6E56">C</text>
+          <text x="216" y="299" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="500" fill="#0F6E56">C</text>
+          <text x="273" y="299" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="500" fill="#0F6E56">C</text>
+        </g>
+        <!-- legend -->
+        <text x="620" y="210" font-family="Inter,sans-serif" font-size="12" fill="#888780">array[row][col]</text>
+        <text x="620" y="230" font-family="JetBrains Mono,monospace" font-size="12" fill="#378ADD">array[0][0] = A</text>
+        <text x="620" y="248" font-family="JetBrains Mono,monospace" font-size="12" fill="#534AB7">array[1][1] = B</text>
+        <text x="620" y="266" font-family="JetBrains Mono,monospace" font-size="12" fill="#0F6E56">array[2][2] = C</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ===== SECTION 2: 1D ARRAYS ===== -->
+  <section class="section" id="1d">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--purple-50);">📐</div>
+      <h2>One-Dimensional Arrays</h2>
+    </div>
+    <div class="section-divider"></div>
+
+    <div class="def-box" style="background:var(--purple-50);border-left-color:var(--purple-600);">
+      <p style="color:var(--purple-800);">A <strong>one-dimensional array (1-D array)</strong> is a variable that represents a list of items using only <strong>one index (subscript)</strong>. It is the simplest form of an array.</p>
+    </div>
+
+    <!-- Syntax -->
+    <h3 style="font-size:1rem;font-weight:600;margin:1.25rem 0 0.6rem;">Declaration Syntax</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-lang">C Syntax</span>
+      </div>
+      <div class="code-body">
+<span class="ty">type</span> arr_name[<span class="nm">size</span>];<br><br>
+<span class="cm">// Examples:</span><br>
+<span class="ty">int</span>   marks[<span class="nm">30</span>];         <span class="cm">// 30 integers</span><br>
+<span class="ty">float</span> press[<span class="nm">10</span>];         <span class="cm">// 10 floats</span><br>
+<span class="ty">int</span>   b[<span class="nm">100</span>], x[<span class="nm">27</span>];    <span class="cm">// two arrays at once</span>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin:1rem 0;">
+      <div class="card">
+        <h3>type</h3>
+        <p>Any valid C data type: <code style="font-family:var(--mono);font-size:12px;background:var(--gray-50);padding:1px 5px;border-radius:4px;">int</code>, <code style="font-family:var(--mono);font-size:12px;background:var(--gray-50);padding:1px 5px;border-radius:4px;">float</code>, <code style="font-family:var(--mono);font-size:12px;background:var(--gray-50);padding:1px 5px;border-radius:4px;">char</code>, etc. All elements must be the same type.</p>
+      </div>
+      <div class="card">
+        <h3>size</h3>
+        <p>Specifies how many elements the array can hold. The brackets <code style="font-family:var(--mono);font-size:12px;background:var(--gray-50);padding:1px 5px;border-radius:4px;">[ ]</code> tell the compiler we are dealing with an array.</p>
+      </div>
+    </div>
+
+    <!-- Initialization -->
+    <h3 style="font-size:1rem;font-weight:600;margin:1.5rem 0 0.6rem;">Initializing Arrays in C</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-lang">C — Initialization</span>
+      </div>
+      <div class="code-body">
+<span class="cm">// Method 1: with explicit size</span><br>
+<span class="ty">int</span> mark[<span class="nm">5</span>] <span class="op">=</span> {<span class="nm">19</span>, <span class="nm">10</span>, <span class="nm">8</span>, <span class="nm">17</span>, <span class="nm">9</span>};<br><br>
+<span class="cm">// Method 2: compiler infers size (also 5 here)</span><br>
+<span class="ty">int</span> mark[] <span class="op">=</span> {<span class="nm">19</span>, <span class="nm">10</span>, <span class="nm">8</span>, <span class="nm">17</span>, <span class="nm">9</span>};<br><br>
+<span class="cm">// Method 3: mixed examples</span><br>
+<span class="ty">int</span>   num[<span class="nm">6</span>]    <span class="op">=</span> {<span class="nm">2</span>, <span class="nm">4</span>, <span class="nm">12</span>, <span class="nm">5</span>, <span class="nm">45</span>, <span class="nm">5</span>};<br>
+<span class="ty">float</span> press[]   <span class="op">=</span> {<span class="nm">12.3</span>, <span class="nm">34.2</span>, <span class="op">-</span><span class="nm">23.4</span>, <span class="op">-</span><span class="nm">11.3</span>};
+      </div>
+    </div>
+
+    <!-- Visual initialization -->
+    <div class="array-visual">
+      <div class="label">int mark[5] = {19, 10, 8, 17, 9} — memory layout</div>
+      <div class="array-row">
+        <div class="array-cell" style="background:var(--blue-50);color:var(--blue-800);">19</div>
+        <div class="array-cell" style="background:var(--blue-50);color:var(--blue-800);">10</div>
+        <div class="array-cell" style="background:var(--blue-50);color:var(--blue-800);">8</div>
+        <div class="array-cell" style="background:var(--blue-50);color:var(--blue-800);">17</div>
+        <div class="array-cell" style="background:var(--blue-50);color:var(--blue-800);">9</div>
+      </div>
+      <div class="array-indices">
+        <div class="array-index" style="font-family:var(--mono);color:var(--text3);">mark[0]</div>
+        <div class="array-index" style="font-family:var(--mono);color:var(--text3);">mark[1]</div>
+        <div class="array-index" style="font-family:var(--mono);color:var(--text3);">mark[2]</div>
+        <div class="array-index" style="font-family:var(--mono);color:var(--text3);">mark[3]</div>
+        <div class="array-index" style="font-family:var(--mono);color:var(--text3);">mark[4]</div>
+      </div>
+    </div>
+
+    <!-- Accessing elements -->
+    <h3 style="font-size:1rem;font-weight:600;margin:1.5rem 0 0.6rem;">Accessing Array Elements</h3>
+    <div class="def-box">
+      <p>Elements are accessed using a <strong>subscript</strong>. The subscript specifies the element's position. All elements are numbered starting with <strong>0</strong>, so <code style="font-family:var(--mono);font-size:12.5px;">arr[2]</code> is the <strong>third</strong> element, not the second.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-lang">C — Accessing Elements</span>
+      </div>
+      <div class="code-body">
+<span class="ty">int</span> arr[] <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>};<br><br>
+<span class="ty">int</span> val <span class="op">=</span> arr[<span class="nm">2</span>];         <span class="cm">// val = 3 (third element)</span><br><br>
+<span class="cm">// Array elements behave like normal variables</span><br>
+c[<span class="nm">0</span>] <span class="op">=</span> <span class="nm">3</span>;<br>
+<span class="fn">printf</span>(<span class="st">"%d"</span>, c[<span class="nm">0</span>]);      <span class="cm">// prints 3</span><br><br>
+<span class="cm">// Operations in subscript (if x == 3)</span><br>
+c[<span class="nm">5</span><span class="op">-</span><span class="nm">2</span>] <span class="op">==</span> c[<span class="nm">3</span>] <span class="op">==</span> c[x]   <span class="cm">// all refer to same element</span>
+      </div>
+    </div>
+
+    <!-- Input/Output -->
+    <h3 style="font-size:1rem;font-weight:600;margin:1.5rem 0 0.6rem;">1-D Array Input / Output</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-lang">C — Array I/O</span>
+      </div>
+      <div class="code-body">
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span><br>
+<span class="ty">int</span> <span class="fn">main</span>() {<br>
+    <span class="ty">int</span> values[<span class="nm">5</span>];<br>
+    <span class="fn">printf</span>(<span class="st">"Enter 5 integers: "</span>);<br><br>
+    <span class="cm">// Taking input and storing in the array</span><br>
+    <span class="kw">for</span>(<span class="ty">int</span> i <span class="op">=</span> <span class="nm">0</span>; i <span class="op">&lt;</span> <span class="nm">5</span>; <span class="op">++</span>i) {<br>
+        <span class="fn">scanf</span>(<span class="st">"%d"</span>, <span class="op">&amp;</span>values[i]);<br>
+    }<br><br>
+    <span class="cm">// Printing elements of the array</span><br>
+    <span class="kw">for</span>(<span class="ty">int</span> i <span class="op">=</span> <span class="nm">0</span>; i <span class="op">&lt;</span> <span class="nm">5</span>; <span class="op">++</span>i) {<br>
+        <span class="fn">printf</span>(<span class="st">"%d\n"</span>, values[i]);<br>
+    }<br>
+    <span class="kw">return</span> <span class="nm">0</span>;<br>
+}
+      </div>
+    </div>
+
+    <!-- Sum of array -->
+    <h3 style="font-size:1rem;font-weight:600;margin:1.5rem 0 0.6rem;">Sum of Array Elements</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-lang">C — Sum of Array</span>
+      </div>
+      <div class="code-body">
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span><br>
+<span class="kw">#define</span> SIZE <span class="nm">12</span><br>
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {<br>
+    <span class="ty">int</span> a[<span class="nm">12</span>] <span class="op">=</span> {<span class="nm">1</span>,<span class="nm">3</span>,<span class="nm">5</span>,<span class="nm">4</span>,<span class="nm">7</span>,<span class="nm">2</span>,<span class="nm">99</span>,<span class="nm">16</span>,<span class="nm">45</span>,<span class="nm">67</span>,<span class="nm">89</span>,<span class="nm">45</span>};<br>
+    <span class="ty">int</span> i, total <span class="op">=</span> <span class="nm">0</span>;<br><br>
+    <span class="kw">for</span>(i <span class="op">=</span> <span class="nm">0</span>; i <span class="op">&lt;</span> SIZE; i++) {<br>
+        total <span class="op">+=</span> a[i];     <span class="cm">// accumulate sum</span><br>
+    }<br><br>
+    <span class="fn">printf</span>(<span class="st">"Total = %d\n"</span>, total);<br>
+    <span class="cm">// Output: Total of array element values is 383</span><br>
+    <span class="kw">return</span> <span class="nm">0</span>;<br>
+}
+      </div>
+    </div>
+
+    <!-- Max/Min -->
+    <h3 style="font-size:1rem;font-weight:600;margin:1.5rem 0 0.6rem;">Find Maximum and Minimum Element</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-lang">C — Max &amp; Min</span>
+      </div>
+      <div class="code-body">
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span><br>
+<span class="ty">int</span> <span class="fn">main</span>() {<br>
+    <span class="ty">int</span> arr1[<span class="nm">100</span>], i, max, min, n;<br><br>
+    <span class="fn">printf</span>(<span class="st">"Number of elements: "</span>); <span class="fn">scanf</span>(<span class="st">"%d"</span>, <span class="op">&amp;</span>n);<br>
+    <span class="kw">for</span>(i <span class="op">=</span> <span class="nm">0</span>; i <span class="op">&lt;</span> n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, <span class="op">&amp;</span>arr1[i]);<br><br>
+    max <span class="op">=</span> min <span class="op">=</span> arr1[<span class="nm">0</span>];  <span class="cm">// initialise with first element</span><br><br>
+    <span class="kw">for</span>(i <span class="op">=</span> <span class="nm">1</span>; i <span class="op">&lt;</span> n; i++) {<br>
+        <span class="kw">if</span>(arr1[i] <span class="op">&gt;</span> max) max <span class="op">=</span> arr1[i];  <span class="cm">// update max</span><br>
+        <span class="kw">if</span>(arr1[i] <span class="op">&lt;</span> min) min <span class="op">=</span> arr1[i];  <span class="cm">// update min</span><br>
+    }<br>
+    <span class="fn">printf</span>(<span class="st">"Max = %d, Min = %d\n"</span>, max, min);<br>
+    <span class="kw">return</span> <span class="nm">0</span>;<br>
+}
+      </div>
+    </div>
+
+    <!-- Insert element -->
+    <h3 style="font-size:1rem;font-weight:600;margin:1.5rem 0 0.6rem;">Practice: Insert an Element in an Array</h3>
+
+    <!-- Insert diagram -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">📊 Insert at position 5 — shift elements forward</div>
+      <svg width="100%" viewBox="0 0 860 220" role="img">
+        <title>Insert operation diagram</title>
+        <desc>Demonstrates inserting element 50 at position 5 by shifting elements forward</desc>
+        <!-- Before -->
+        <text x="40" y="35" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#5F5E5A">Before Insert:</text>
+        <g>
+          <rect x="40" y="45" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="92" y="45" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="144" y="45" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="196" y="45" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="248" y="45" width="50" height="38" rx="5" fill="#FAEEDA" stroke="#BA7517" stroke-width="1.5"/>
+          <rect x="300" y="45" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="352" y="45" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="404" y="45" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="456" y="45" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="508" y="45" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <text x="65" y="69" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">1</text>
+          <text x="117" y="69" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">2</text>
+          <text x="169" y="69" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">3</text>
+          <text x="221" y="69" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">4</text>
+          <text x="273" y="69" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600" fill="#854F0B">5</text>
+          <text x="325" y="69" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">6</text>
+          <text x="377" y="69" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">7</text>
+          <text x="429" y="69" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">8</text>
+          <text x="481" y="69" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">9</text>
+          <text x="533" y="69" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">10</text>
+          <!-- pos indicator -->
+          <text x="273" y="95" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#BA7517">pos=5</text>
+        </g>
+        <!-- Insert value indicator -->
+        <rect x="620" y="40" width="60" height="38" rx="5" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/>
+        <text x="650" y="59" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600" fill="#0F6E56">50</text>
+        <text x="650" y="72" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#0F6E56">x = 50</text>
+        <text x="615" y="55" font-family="Inter,sans-serif" font-size="12" fill="#888780">insert →</text>
+        <!-- Arrow down -->
+        <line x1="440" y1="115" x2="440" y2="145" stroke="#888780" stroke-width="1" marker-end="url(#a2)"/>
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+        <!-- After -->
+        <text x="40" y="140" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#5F5E5A">After Insert (50 at position 5):</text>
+        <g>
+          <rect x="40" y="150" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="92" y="150" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="144" y="150" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="196" y="150" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="248" y="150" width="50" height="38" rx="5" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/>
+          <rect x="300" y="150" width="50" height="38" rx="5" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.8"/>
+          <rect x="352" y="150" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="404" y="150" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="456" y="150" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="508" y="150" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <rect x="560" y="150" width="50" height="38" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+          <text x="65" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">1</text>
+          <text x="117" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">2</text>
+          <text x="169" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">3</text>
+          <text x="221" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">4</text>
+          <text x="273" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600" fill="#0F6E56">50</text>
+          <text x="325" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#854F0B">5</text>
+          <text x="377" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">6</text>
+          <text x="429" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">7</text>
+          <text x="481" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">8</text>
+          <text x="533" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">9</text>
+          <text x="585" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#185FA5">10</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-lang">C — Insert Element at Specific Position</span>
+      </div>
+      <div class="code-body">
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span><br>
+<span class="ty">int</span> <span class="fn">main</span>() {<br>
+    <span class="ty">int</span> arr[<span class="nm">100</span>] <span class="op">=</span> {<span class="nm">0</span>};<br>
+    <span class="ty">int</span> i, x, pos, n <span class="op">=</span> <span class="nm">10</span>;<br><br>
+    <span class="kw">for</span>(i <span class="op">=</span> <span class="nm">0</span>; i <span class="op">&lt;</span> n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, <span class="op">&amp;</span>arr[i]);<br><br>
+    x   <span class="op">=</span> <span class="nm">50</span>;   <span class="cm">// element to insert</span><br>
+    pos <span class="op">=</span> <span class="nm">5</span>;    <span class="cm">// position (1-indexed)</span><br>
+    n<span class="op">++</span>;        <span class="cm">// increase size</span><br><br>
+    <span class="cm">// Shift elements forward from the end</span><br>
+    <span class="kw">for</span>(i <span class="op">=</span> n; i <span class="op">&gt;=</span> pos; i<span class="op">--</span>)<br>
+        arr[i] <span class="op">=</span> arr[i <span class="op">-</span> <span class="nm">1</span>];<br><br>
+    arr[pos <span class="op">-</span> <span class="nm">1</span>] <span class="op">=</span> x;  <span class="cm">// insert x at pos</span><br><br>
+    <span class="kw">for</span>(i <span class="op">=</span> <span class="nm">0</span>; i <span class="op">&lt;</span> n; i++) <span class="fn">printf</span>(<span class="st">"%d "</span>, arr[i]);<br>
+    <span class="kw">return</span> <span class="nm">0</span>;<br>
+}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SECTION 3: LINEAR SEARCH ===== -->
+  <section class="section" id="linear">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-50);">🔍</div>
+      <h2>Linear Search</h2>
+    </div>
+    <div class="section-divider"></div>
+
+    <div class="def-box" style="background:var(--amber-50);border-left-color:var(--amber-400);">
+      <p style="color:var(--amber-600);">Linear search checks each element of the array <strong>one by one</strong> from the beginning until the target element is found or the array ends. Also called <strong>sequential search</strong>.</p>
+    </div>
+
+    <!-- Steps -->
+    <h3 style="font-size:1rem;font-weight:600;margin:1.25rem 0 0.75rem;">Algorithm Steps</h3>
+    <div class="steps-visual">
+      <div class="step-item">
+        <div class="step-num" style="background:var(--blue-50);color:var(--blue-800);">1</div>
+        <div class="step-text"><strong>Read</strong> the search element from the user.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num" style="background:var(--blue-50);color:var(--blue-800);">2</div>
+        <div class="step-text"><strong>Compare</strong> the search element with the first element in the list.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num" style="background:var(--teal-50);color:var(--teal-600);">3</div>
+        <div class="step-text">If both are <strong>matched</strong>, display <em>"Given element is found!!!"</em> and terminate.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num" style="background:var(--amber-50);color:var(--amber-600);">4</div>
+        <div class="step-text">If <strong>not matched</strong>, compare search element with the <strong>next element</strong> in the list.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num" style="background:var(--blue-50);color:var(--blue-800);">5</div>
+        <div class="step-text"><strong>Repeat</strong> steps 3 and 4 until the search element is compared with the last element.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num" style="background:var(--red-50);color:var(--red-600);">6</div>
+        <div class="step-text">If the last element also doesn't match, display <em>"Element is not found!!!"</em> and terminate.</div>
+      </div>
+    </div>
+
+    <!-- Linear Search Flowchart -->
+    <div class="diagram-wrap" style="margin:1.5rem 0;">
+      <div class="diagram-title">📊 Linear Search Flowchart</div>
+      <svg width="100%" viewBox="0 0 680 580" role="img">
+        <title>Linear Search Flowchart</title>
+        <desc>Flowchart showing the linear search algorithm step by step</desc>
+        <defs>
+          <marker id="arrowLS" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <!-- Start -->
+        <ellipse cx="340" cy="40" rx="70" ry="26" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1"/>
+        <text x="340" y="45" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#0F6E56">START</text>
+
+        <line x1="340" y1="66" x2="340" y2="90" stroke="#888780" stroke-width="1" marker-end="url(#arrowLS)"/>
+
+        <!-- Read element -->
+        <rect x="220" y="90" width="240" height="42" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+        <text x="340" y="116" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" fill="#0C447C">Read search element</text>
+
+        <line x1="340" y1="132" x2="340" y2="155" stroke="#888780" stroke-width="1" marker-end="url(#arrowLS)"/>
+
+        <!-- Set i = 0 -->
+        <rect x="220" y="155" width="240" height="42" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+        <text x="340" y="181" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" fill="#0C447C">Set i = 0</text>
+
+        <line x1="340" y1="197" x2="340" y2="220" stroke="#888780" stroke-width="1" marker-end="url(#arrowLS)"/>
+
+        <!-- Decision: i < n? -->
+        <polygon points="340,220 440,258 340,296 240,258" fill="#FAEEDA" stroke="#BA7517" stroke-width="1"/>
+        <text x="340" y="254" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#854F0B">i &lt; n ?</text>
+        <text x="340" y="270" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#854F0B">(more elements?)</text>
+
+        <!-- Yes arrow down -->
+        <line x1="340" y1="296" x2="340" y2="320" stroke="#888780" stroke-width="1" marker-end="url(#arrowLS)"/>
+        <text x="350" y="312" font-family="Inter,sans-serif" font-size="11" fill="#639922">Yes</text>
+
+        <!-- Compare -->
+        <polygon points="340,320 440,358 340,396 240,358" fill="#EEEDFE" stroke="#7F77DD" stroke-width="1"/>
+        <text x="340" y="354" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#3C3489">arr[i] ==</text>
+        <text x="340" y="370" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#3C3489">search?</text>
+
+        <!-- Yes arrow right (found) -->
+        <line x1="440" y1="358" x2="520" y2="358" stroke="#888780" stroke-width="1" marker-end="url(#arrowLS)"/>
+        <text x="460" y="350" font-family="Inter,sans-serif" font-size="11" fill="#639922">Yes</text>
+        <rect x="520" y="336" width="130" height="44" rx="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1"/>
+        <text x="585" y="355" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#0F6E56">Element found!</text>
+        <text x="585" y="371" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#0F6E56">Print position</text>
+
+        <!-- No arrow down from compare -->
+        <line x1="340" y1="396" x2="340" y2="420" stroke="#888780" stroke-width="1" marker-end="url(#arrowLS)"/>
+        <text x="350" y="414" font-family="Inter,sans-serif" font-size="11" fill="#E24B4A">No</text>
+
+        <!-- i++ -->
+        <rect x="220" y="420" width="240" height="42" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+        <text x="340" y="446" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" fill="#0C447C">i = i + 1</text>
+
+        <!-- Loop back arrow -->
+        <line x1="220" y1="441" x2="160" y2="441" stroke="#888780" stroke-width="1"/>
+        <line x1="160" y1="441" x2="160" y2="258" stroke="#888780" stroke-width="1"/>
+        <line x1="160" y1="258" x2="240" y2="258" stroke="#888780" stroke-width="1" marker-end="url(#arrowLS)"/>
+
+        <!-- No from i<n (not found) -->
+        <line x1="240" y1="258" x2="100" y2="258" stroke="#888780" stroke-width="1"/>
+        <line x1="100" y1="258" x2="100" y2="490" stroke="#888780" stroke-width="1"/>
+        <line x1="100" y1="490" x2="220" y2="490" stroke="#888780" stroke-width="1" marker-end="url(#arrowLS)"/>
+        <text x="175" y="245" font-family="Inter,sans-serif" font-size="11" fill="#E24B4A">No (i ≥ n)</text>
+
+        <!-- Not found -->
+        <rect x="220" y="468" width="240" height="44" rx="8" fill="#FCEBEB" stroke="#E24B4A" stroke-width="1"/>
+        <text x="340" y="487" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#A32D2D">Element not found!</text>
+        <text x="340" y="503" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#A32D2D">Print message</text>
+
+        <!-- End -->
+        <line x1="340" y1="512" x2="340" y2="542" stroke="#888780" stroke-width="1" marker-end="url(#arrowLS)"/>
+        <ellipse cx="340" cy="558" rx="70" ry="22" fill="#FCEBEB" stroke="#E24B4A" stroke-width="1"/>
+        <text x="340" y="563" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#A32D2D">END</text>
+      </svg>
+    </div>
+
+    <!-- Interactive Linear Search -->
+    <div class="search-demo">
+      <h4>🎮 Try it: Interactive Linear Search</h4>
+      <div class="demo-array-container">
+        <div id="ls-array-row" class="array-row" style="width:max-content;"></div>
+        <div id="ls-index-row" class="array-indices" style="width:max-content;"></div>
+      </div>
+      <div class="demo-controls" style="margin-top:1rem;">
+        <label style="font-size:13px;color:var(--text2);">Search for:</label>
+        <input type="number" id="ls-input" value="45" min="0">
+        <button class="demo-btn primary" onclick="linearSearchStep()">Step →</button>
+        <button class="demo-btn" onclick="linearSearchReset()">Reset</button>
+        <button class="demo-btn" onclick="linearSearchAuto()">Auto Run</button>
+      </div>
+      <div id="ls-status" class="demo-status info">Enter a number and click Step to begin.</div>
+      <div id="ls-steps" class="demo-steps"></div>
+    </div>
+
+    <!-- Code -->
+    <div class="code-block" style="margin-top:1rem;">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-lang">C — Linear Search Implementation</span>
+      </div>
+      <div class="code-body">
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span><br>
+<span class="ty">int</span> <span class="fn">main</span>() {<br>
+    <span class="ty">int</span> array[<span class="nm">100</span>], search, c, n;<br>
+    <span class="fn">printf</span>(<span class="st">"Enter number of elements\n"</span>); <span class="fn">scanf</span>(<span class="st">"%d"</span>, <span class="op">&amp;</span>n);<br>
+    <span class="fn">printf</span>(<span class="st">"Enter %d integers\n"</span>, n);<br>
+    <span class="kw">for</span>(c <span class="op">=</span> <span class="nm">0</span>; c <span class="op">&lt;</span> n; c++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, <span class="op">&amp;</span>array[c]);<br><br>
+    <span class="fn">printf</span>(<span class="st">"Enter number to search\n"</span>); <span class="fn">scanf</span>(<span class="st">"%d"</span>, <span class="op">&amp;</span>search);<br><br>
+    <span class="cm">// Linear search loop</span><br>
+    <span class="kw">for</span>(c <span class="op">=</span> <span class="nm">0</span>; c <span class="op">&lt;</span> n; c++) {<br>
+        <span class="kw">if</span>(array[c] <span class="op">==</span> search) {<br>
+            <span class="fn">printf</span>(<span class="st">"%d found at location %d\n"</span>, search, c<span class="op">+</span><span class="nm">1</span>);<br>
+            <span class="kw">break</span>;<br>
+        }<br>
+    }<br>
+    <span class="kw">if</span>(c <span class="op">==</span> n)<br>
+        <span class="fn">printf</span>(<span class="st">"%d not in array\n"</span>, search);<br>
+    <span class="kw">return</span> <span class="nm">0</span>;<br>
+}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SECTION 4: BINARY SEARCH ===== -->
+  <section class="section" id="binary">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--teal-50);">⚡</div>
+      <h2>Binary Search</h2>
+    </div>
+    <div class="section-divider"></div>
+
+    <div class="def-box" style="background:var(--teal-50);border-left-color:var(--teal-600);">
+      <p style="color:var(--teal-800);">Binary search works on a <strong>sorted array</strong> by repeatedly dividing the search interval in half. It compares the target with the <strong>middle element</strong> and eliminates half the array each time, making it much faster than linear search.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card" style="border-left:3px solid var(--amber-400);">
+        <h3>⚠️ Pre-condition</h3>
+        <p>The array <strong>must be sorted</strong> (ascending or descending) before binary search can be applied.</p>
+      </div>
+      <div class="card" style="border-left:3px solid var(--teal-400);">
+        <h3>⚡ Efficiency</h3>
+        <p>Binary search is <strong>O(log n)</strong> — for 1,000,000 elements, it needs at most ~20 comparisons!</p>
+      </div>
+    </div>
+
+    <!-- Binary Search Flowchart -->
+    <div class="diagram-wrap" style="margin:1.5rem 0;">
+      <div class="diagram-title">📊 Binary Search Flowchart</div>
+      <svg width="100%" viewBox="0 0 680 640" role="img">
+        <title>Binary Search Flowchart</title>
+        <desc>Flowchart showing how binary search narrows down the search range by halving each time</desc>
+        <defs>
+          <marker id="arrowBS" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <!-- Start -->
+        <ellipse cx="340" cy="36" rx="80" ry="26" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1"/>
+        <text x="340" y="41" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#0F6E56">START</text>
+
+        <line x1="340" y1="62" x2="340" y2="85" stroke="#888780" stroke-width="1" marker-end="url(#arrowBS)"/>
+
+        <!-- Initialize -->
+        <rect x="195" y="85" width="290" height="52" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+        <text x="340" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" fill="#0C447C">first = 0</text>
+        <text x="340" y="125" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" fill="#0C447C">last = n−1, middle = (first+last)/2</text>
+
+        <line x1="340" y1="137" x2="340" y2="162" stroke="#888780" stroke-width="1" marker-end="url(#arrowBS)"/>
+
+        <!-- While first <= last -->
+        <polygon points="340,162 460,202 340,242 220,202" fill="#FAEEDA" stroke="#BA7517" stroke-width="1"/>
+        <text x="340" y="198" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#854F0B">first ≤ last?</text>
+        <text x="340" y="215" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#854F0B">(search range valid)</text>
+
+        <!-- No arrow — not found -->
+        <line x1="220" y1="202" x2="60" y2="202" stroke="#888780" stroke-width="1"/>
+        <line x1="60" y1="202" x2="60" y2="580" stroke="#888780" stroke-width="1"/>
+        <line x1="60" y1="580" x2="195" y2="580" stroke="#888780" stroke-width="1" marker-end="url(#arrowBS)"/>
+        <text x="120" y="190" font-family="Inter,sans-serif" font-size="11" fill="#E24B4A">No</text>
+
+        <!-- Yes down -->
+        <line x1="340" y1="242" x2="340" y2="268" stroke="#888780" stroke-width="1" marker-end="url(#arrowBS)"/>
+        <text x="350" y="260" font-family="Inter,sans-serif" font-size="11" fill="#639922">Yes</text>
+
+        <!-- arr[mid] == key? -->
+        <polygon points="340,268 460,308 340,348 220,308" fill="#EEEDFE" stroke="#7F77DD" stroke-width="1"/>
+        <text x="340" y="304" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#3C3489">arr[mid]</text>
+        <text x="340" y="320" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#3C3489">== key?</text>
+
+        <!-- Yes right — found! -->
+        <line x1="460" y1="308" x2="540" y2="308" stroke="#888780" stroke-width="1" marker-end="url(#arrowBS)"/>
+        <text x="490" y="298" font-family="Inter,sans-serif" font-size="11" fill="#639922">Yes</text>
+        <rect x="540" y="286" width="120" height="44" rx="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1"/>
+        <text x="600" y="305" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#0F6E56">KEY FOUND</text>
+        <text x="600" y="321" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#0F6E56">at index mid</text>
+
+        <!-- No down from mid==key -->
+        <line x1="340" y1="348" x2="340" y2="374" stroke="#888780" stroke-width="1" marker-end="url(#arrowBS)"/>
+        <text x="350" y="367" font-family="Inter,sans-serif" font-size="11" fill="#E24B4A">No</text>
+
+        <!-- arr[mid] > key? -->
+        <polygon points="340,374 460,412 340,450 220,412" fill="#FAECE7" stroke="#D85A30" stroke-width="1"/>
+        <text x="340" y="408" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#712B13">arr[mid]</text>
+        <text x="340" y="424" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#712B13">&gt; key?</text>
+
+        <!-- Yes left: last = mid-1 -->
+        <line x1="220" y1="412" x2="140" y2="412" stroke="#888780" stroke-width="1" marker-end="url(#arrowBS)"/>
+        <text x="168" y="400" font-family="Inter,sans-serif" font-size="11" fill="#639922">Yes</text>
+        <rect x="40" y="390" width="100" height="44" rx="8" fill="#FAECE7" stroke="#D85A30" stroke-width="0.8"/>
+        <text x="90" y="408" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#993C1D">last =</text>
+        <text x="90" y="424" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#993C1D">mid − 1</text>
+
+        <!-- No right: first = mid+1 -->
+        <line x1="460" y1="412" x2="540" y2="412" stroke="#888780" stroke-width="1" marker-end="url(#arrowBS)"/>
+        <text x="490" y="400" font-family="Inter,sans-serif" font-size="11" fill="#E24B4A">No</text>
+        <rect x="540" y="390" width="100" height="44" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+        <text x="590" y="408" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#185FA5">first =</text>
+        <text x="590" y="424" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#185FA5">mid + 1</text>
+
+        <!-- Recalculate middle -->
+        <line x1="90" y1="434" x2="90" y2="490" stroke="#888780" stroke-width="1"/>
+        <line x1="590" y1="434" x2="590" y2="490" stroke="#888780" stroke-width="1"/>
+        <line x1="90" y1="490" x2="590" y2="490" stroke="#888780" stroke-width="1"/>
+        <line x1="340" y1="490" x2="340" y2="515" stroke="#888780" stroke-width="1" marker-end="url(#arrowBS)"/>
+
+        <rect x="195" y="515" width="290" height="40" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
+        <text x="340" y="540" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" fill="#0C447C">middle = (first + last) / 2</text>
+
+        <!-- Loop back to while -->
+        <line x1="340" y1="555" x2="340" y2="570" stroke="#888780" stroke-width="1"/>
+        <line x1="340" y1="570" x2="620" y2="570" stroke="#888780" stroke-width="1"/>
+        <line x1="620" y1="570" x2="620" y2="202" stroke="#888780" stroke-width="1"/>
+        <line x1="620" y1="202" x2="460" y2="202" stroke="#888780" stroke-width="1" marker-end="url(#arrowBS)"/>
+
+        <!-- Not found box -->
+        <rect x="195" y="558" width="290" height="44" rx="8" fill="#FCEBEB" stroke="#E24B4A" stroke-width="1"/>
+        <text x="340" y="576" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#A32D2D">NOT FOUND</text>
+        <text x="340" y="592" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#A32D2D">Print "Key not in list"</text>
+
+        <!-- End -->
+        <line x1="340" y1="602" x2="340" y2="622" stroke="#888780" stroke-width="1" marker-end="url(#arrowBS)"/>
+        <ellipse cx="340" cy="634" rx="70" ry="22" fill="#FCEBEB" stroke="#E24B4A" stroke-width="1"/>
+        <text x="340" y="639" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#A32D2D">END</text>
+      </svg>
+    </div>
+
+    <!-- Interactive Binary Search -->
+    <div class="search-demo">
+      <h4>🎮 Try it: Interactive Binary Search</h4>
+      <p style="font-size:12.5px;color:var(--text3);margin-bottom:0.75rem;">Array is pre-sorted. Watch how it finds (or doesn't find) your number!</p>
+      <div class="demo-array-container">
+        <div id="bs-array-row" class="array-row" style="width:max-content;"></div>
+        <div id="bs-index-row" class="array-indices" style="width:max-content;"></div>
+      </div>
+      <div class="demo-controls" style="margin-top:1rem;">
+        <label style="font-size:13px;color:var(--text2);">Search for:</label>
+        <input type="number" id="bs-input" value="45" min="0">
+        <button class="demo-btn primary" onclick="binarySearchStep()">Step →</button>
+        <button class="demo-btn" onclick="binarySearchReset()">Reset</button>
+        <button class="demo-btn" onclick="binarySearchAuto()">Auto Run</button>
+      </div>
+      <div id="bs-status" class="demo-status info">Enter a number and click Step to begin.</div>
+      <div id="bs-steps" class="demo-steps"></div>
+    </div>
+
+    <!-- Code -->
+    <div class="code-block" style="margin-top:1rem;">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-lang">C — Binary Search Implementation</span>
+      </div>
+      <div class="code-body">
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span><br>
+<span class="ty">void</span> <span class="fn">main</span>() {<br>
+    <span class="ty">int</span> n, i, arr[<span class="nm">50</span>], search, first, last, middle;<br>
+    <span class="fn">printf</span>(<span class="st">"Enter total number of elements: "</span>); <span class="fn">scanf</span>(<span class="st">"%d"</span>, <span class="op">&amp;</span>n);<br>
+    <span class="fn">printf</span>(<span class="st">"Enter %d numbers: "</span>, n);<br>
+    <span class="kw">for</span>(i <span class="op">=</span> <span class="nm">0</span>; i <span class="op">&lt;</span> n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, <span class="op">&amp;</span>arr[i]);<br><br>
+    <span class="fn">printf</span>(<span class="st">"Enter a number to find: "</span>); <span class="fn">scanf</span>(<span class="st">"%d"</span>, <span class="op">&amp;</span>search);<br><br>
+    first  <span class="op">=</span> <span class="nm">0</span>;<br>
+    last   <span class="op">=</span> n <span class="op">-</span> <span class="nm">1</span>;<br>
+    middle <span class="op">=</span> (first <span class="op">+</span> last) <span class="op">/</span> <span class="nm">2</span>;<br><br>
+    <span class="kw">while</span>(first <span class="op">&lt;=</span> last) {<br>
+        <span class="kw">if</span>(arr[middle] <span class="op">&lt;</span> search) {<br>
+            first <span class="op">=</span> middle <span class="op">+</span> <span class="nm">1</span>;    <span class="cm">// search right half</span><br>
+        } <span class="kw">else if</span>(arr[middle] <span class="op">==</span> search) {<br>
+            <span class="fn">printf</span>(<span class="st">"%d found at location %d\n"</span>, search, middle<span class="op">+</span><span class="nm">1</span>);<br>
+            <span class="kw">break</span>;<br>
+        } <span class="kw">else</span> {<br>
+            last <span class="op">=</span> middle <span class="op">-</span> <span class="nm">1</span>;     <span class="cm">// search left half</span><br>
+        }<br>
+        middle <span class="op">=</span> (first <span class="op">+</span> last) <span class="op">/</span> <span class="nm">2</span>;<br>
+    }<br>
+    <span class="kw">if</span>(first <span class="op">&gt;</span> last)<br>
+        <span class="fn">printf</span>(<span class="st">"Not found! %d not in list.\n"</span>, search);<br>
+}
+      </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <h3 style="font-size:1rem;font-weight:600;margin:1.75rem 0 0.75rem;">Linear vs Binary Search — Comparison</h3>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Linear Search</th>
+          <th>Binary Search</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Array requirement</td>
+          <td>Works on unsorted arrays</td>
+          <td>Array must be <strong>sorted</strong></td>
+        </tr>
+        <tr>
+          <td>Time complexity</td>
+          <td><span class="badge badge-amber">O(n)</span> — worst case</td>
+          <td><span class="badge badge-teal">O(log n)</span> — much faster</td>
+        </tr>
+        <tr>
+          <td>Best case</td>
+          <td>O(1) — element at index 0</td>
+          <td>O(1) — element is the middle</td>
+        </tr>
+        <tr>
+          <td>Method</td>
+          <td>Sequential, one by one</td>
+          <td>Divide and conquer</td>
+        </tr>
+        <tr>
+          <td>Suitable for</td>
+          <td>Small or unsorted data</td>
+          <td>Large sorted datasets</td>
+        </tr>
+        <tr>
+          <td>Implementation</td>
+          <td>Simple — one loop</td>
+          <td>Slightly more complex</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer>
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:6px;">
+    <div class="logo-icon" style="width:26px;height:26px;font-size:11px;">SN</div>
+    <strong>ScholarNest</strong>
+  </div>
+  <p>Computer Programming Notes &nbsp;·&nbsp; Arrays &amp; Searching Algorithms</p>
+</footer>
+
+<script>
+/* ===== LINEAR SEARCH DEMO ===== */
+const lsArr = [12, 25, 33, 45, 58, 67, 71, 89, 95, 100];
+let lsStep = -1, lsTarget = 45;
+
+function renderLsArray(highlight = -1, found = -1) {
+  const row = document.getElementById('ls-array-row');
+  const idx = document.getElementById('ls-index-row');
+  row.innerHTML = '';
+  idx.innerHTML = '';
+  lsArr.forEach((v, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'array-cell';
+    if (i === found) cell.style.cssText = 'background:#E1F5EE;color:#0F6E56;font-weight:700;';
+    else if (i === highlight) cell.style.cssText = 'background:#FAEEDA;color:#854F0B;font-weight:700;';
+    else if (i < highlight && found === -1) cell.style.cssText = 'background:#F1EFE8;color:#888780;';
+    cell.textContent = v;
+    row.appendChild(cell);
+    const ic = document.createElement('div');
+    ic.className = 'array-index';
+    ic.textContent = i;
+    idx.appendChild(ic);
+  });
+}
+
+function linearSearchReset() {
+  lsStep = -1;
+  renderLsArray();
+  document.getElementById('ls-status').className = 'demo-status info';
+  document.getElementById('ls-status').textContent = 'Enter a number and click Step to begin.';
+  document.getElementById('ls-steps').textContent = '';
+}
+
+function linearSearchStep() {
+  lsTarget = parseInt(document.getElementById('ls-input').value) || 45;
+  if (lsStep === -1) {
+    lsStep = 0;
+    document.getElementById('ls-steps').textContent = 'Checking each element from index 0...';
+  }
+  const status = document.getElementById('ls-status');
+  if (lsStep >= lsArr.length) {
+    status.className = 'demo-status error';
+    status.textContent = `${lsTarget} is NOT in the array. Search complete.`;
+    return;
+  }
+  if (lsArr[lsStep] === lsTarget) {
+    renderLsArray(-1, lsStep);
+    status.className = 'demo-status success';
+    status.textContent = `✅ Found ${lsTarget} at index ${lsStep} (position ${lsStep + 1})!`;
+    document.getElementById('ls-steps').textContent = `Checked ${lsStep + 1} element(s). Found!`;
+    lsStep = lsArr.length + 1;
+  } else {
+    renderLsArray(lsStep);
+    status.className = 'demo-status info';
+    status.textContent = `arr[${lsStep}] = ${lsArr[lsStep]} ≠ ${lsTarget}. Moving to next...`;
+    document.getElementById('ls-steps').textContent = `Step ${lsStep + 1}: Checked index ${lsStep} (value ${lsArr[lsStep]})`;
+    lsStep++;
+    if (lsStep >= lsArr.length) {
+      renderLsArray();
+      status.className = 'demo-status error';
+      status.textContent = `❌ ${lsTarget} is NOT in the array.`;
+    }
+  }
+}
+
+function linearSearchAuto() {
+  linearSearchReset();
+  lsTarget = parseInt(document.getElementById('ls-input').value) || 45;
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i >= lsArr.length) { clearInterval(interval); return; }
+    if (lsArr[i] === lsTarget) {
+      renderLsArray(-1, i);
+      document.getElementById('ls-status').className = 'demo-status success';
+      document.getElementById('ls-status').textContent = `✅ Found ${lsTarget} at index ${i}!`;
+      document.getElementById('ls-steps').textContent = `Checked ${i+1} element(s). Found!`;
+      clearInterval(interval); return;
+    }
+    renderLsArray(i);
+    document.getElementById('ls-status').className = 'demo-status info';
+    document.getElementById('ls-status').textContent = `arr[${i}] = ${lsArr[i]} ≠ ${lsTarget}`;
+    document.getElementById('ls-steps').textContent = `Step ${i+1}: Checking index ${i}...`;
+    i++;
+    if (i >= lsArr.length) {
+      document.getElementById('ls-status').className = 'demo-status error';
+      document.getElementById('ls-status').textContent = `❌ ${lsTarget} not found.`;
+      clearInterval(interval);
+    }
+  }, 600);
+}
+
+/* ===== BINARY SEARCH DEMO ===== */
+const bsArr = [5, 12, 19, 27, 33, 45, 58, 67, 78, 89];
+let bsFirst, bsLast, bsMid, bsDone, bsTarget;
+
+function renderBsArray(first, last, mid, foundIdx = -1) {
+  const row = document.getElementById('bs-array-row');
+  const idx = document.getElementById('bs-index-row');
+  row.innerHTML = '';
+  idx.innerHTML = '';
+  bsArr.forEach((v, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'array-cell';
+    if (i === foundIdx) {
+      cell.style.cssText = 'background:#E1F5EE;color:#0F6E56;font-weight:700;';
+    } else if (i === mid && foundIdx === -1) {
+      cell.style.cssText = 'background:#FAEEDA;color:#854F0B;font-weight:700;';
+    } else if (i >= first && i <= last && foundIdx === -1) {
+      cell.style.cssText = 'background:#EEEDFE;color:#3C3489;';
+    } else {
+      cell.style.cssText = 'background:#F1EFE8;color:#888780;';
+    }
+    cell.textContent = v;
+    row.appendChild(cell);
+    const ic = document.createElement('div');
+    ic.className = 'array-index';
+    if (i === mid && foundIdx === -1) ic.style.cssText = 'color:#854F0B;font-weight:700;';
+    ic.textContent = i;
+    idx.appendChild(ic);
+  });
+}
+
+function binarySearchReset() {
+  bsFirst = 0; bsLast = bsArr.length - 1;
+  bsMid = Math.floor((bsFirst + bsLast) / 2);
+  bsDone = false;
+  bsTarget = parseInt(document.getElementById('bs-input').value) || 45;
+  renderBsArray(bsFirst, bsLast, bsMid);
+  document.getElementById('bs-status').className = 'demo-status info';
+  document.getElementById('bs-status').textContent = 'Click Step to begin. Purple = search range, Yellow = middle element.';
+  document.getElementById('bs-steps').textContent = '';
+}
+
+function binarySearchStep() {
+  if (bsDone) { binarySearchReset(); return; }
+  bsTarget = parseInt(document.getElementById('bs-input').value) || 45;
+  const status = document.getElementById('bs-status');
+  const steps = document.getElementById('bs-steps');
+
+  if (bsFirst > bsLast) {
+    renderBsArray(0, -1, -1);
+    status.className = 'demo-status error';
+    status.textContent = `❌ ${bsTarget} not found. Search range exhausted.`;
+    bsDone = true; return;
+  }
+
+  bsMid = Math.floor((bsFirst + bsLast) / 2);
+  renderBsArray(bsFirst, bsLast, bsMid);
+  steps.textContent = `first=${bsFirst}, last=${bsLast}, mid=${bsMid} → arr[${bsMid}]=${bsArr[bsMid]}`;
+
+  if (bsArr[bsMid] === bsTarget) {
+    renderBsArray(0, -1, -1, bsMid);
+    status.className = 'demo-status success';
+    status.textContent = `✅ Found ${bsTarget} at index ${bsMid} (position ${bsMid + 1})!`;
+    bsDone = true;
+  } else if (bsArr[bsMid] < bsTarget) {
+    status.className = 'demo-status info';
+    status.textContent = `arr[${bsMid}]=${bsArr[bsMid]} < ${bsTarget} → search RIGHT half`;
+    bsFirst = bsMid + 1;
+  } else {
+    status.className = 'demo-status info';
+    status.textContent = `arr[${bsMid}]=${bsArr[bsMid]} > ${bsTarget} → search LEFT half`;
+    bsLast = bsMid - 1;
+  }
+}
+
+function binarySearchAuto() {
+  binarySearchReset();
+  bsTarget = parseInt(document.getElementById('bs-input').value) || 45;
+  let f = 0, l = bsArr.length - 1;
+  const interval = setInterval(() => {
+    if (f > l) {
+      document.getElementById('bs-status').className = 'demo-status error';
+      document.getElementById('bs-status').textContent = `❌ ${bsTarget} not found.`;
+      clearInterval(interval); return;
+    }
+    const m = Math.floor((f + l) / 2);
+    renderBsArray(f, l, m);
+    document.getElementById('bs-steps').textContent = `first=${f}, last=${l}, mid=${m} → arr[${m}]=${bsArr[m]}`;
+    if (bsArr[m] === bsTarget) {
+      renderBsArray(0, -1, -1, m);
+      document.getElementById('bs-status').className = 'demo-status success';
+      document.getElementById('bs-status').textContent = `✅ Found ${bsTarget} at index ${m}!`;
+      clearInterval(interval); return;
+    } else if (bsArr[m] < bsTarget) {
+      document.getElementById('bs-status').className = 'demo-status info';
+      document.getElementById('bs-status').textContent = `arr[${m}]=${bsArr[m]} < ${bsTarget} → go right`;
+      f = m + 1;
+    } else {
+      document.getElementById('bs-status').className = 'demo-status info';
+      document.getElementById('bs-status').textContent = `arr[${m}]=${bsArr[m]} > ${bsTarget} → go left`;
+      l = m - 1;
+    }
+  }, 800);
+}
+
+// Initialize both demos on load
+renderLsArray();
+binarySearchReset();
+</script>
+</body>
+</html>
